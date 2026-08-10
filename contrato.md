@@ -358,3 +358,15 @@ Este documento funcionará como una bitácora central y contrato de desarrollo p
   - `node --check inline.js` (script extraído, longitud 106.882): sin errores.
   - Harness `repro_test.js` vuelto a correr: escenarios A–E correctos (buffer 1 entidad, SINADER oculto por toggle devuelve 0, contexto full devuelve datasets completos, buffer con `getCurrentResult` null → 0 entidades con sugerencia de regenerar).
 - **Nota:** El resto de la caché de resultados (por firma de parámetros) no cambia; solo se añadió la clave de persistencia `__last_generated__`.
+
+### 2026-08-09 - Publicación del Proyecto en GitHub (Git + GitHub Pages)
+- **Agente:** Antigravity (Desarrollador WebGIS Senior)
+- **Acciones:**
+  - **Control de versiones (git):** repositorio local inicializado en `C:\JORGE\v3` con rama `main`. Configuración de identidad git (`user.name = geoidegeoidal`, `user.email = geoidegeoidal@users.noreply.github.com` solo si no existía previamente).
+  - **`.gitignore`** creado: excluye el Excel bruto `gi-sinader-2024-ckan (1) (1).xlsx` (43 MB, no necesario para la web publicada y conservado solo en local) con `Thumbs.db`, `Desktop.ini`, `.DS_Store`, `*.log`.
+  - **README.md** creado: portada de presentación del proyecto (qué ofrece el visor, cómo usarlo, datos, tecnologías, despliegue).
+  - **Repositorio remoto:** `humedales_version3` (público) en la cuenta `geoidegeoidal` vía `gh repo create`. Commit inicial `5e0e54a` ("Mapa inicial: visor WebGIS de Humedales Urbanos y SINADER de Chile") con 9 archivos (3.984 líneas) y `push` a `origin/main`.
+  - **GitHub Pages activado desde CLI** (`gh api repos/geoidegeoidal/humedales_version3/pages -X POST`, source branch `main`, path `/`, build legacy): URL pública asignada `https://geoidegeoidal.github.io/humedales_version3/`. Build compilado correctamente (`status: built`).
+  - **Verificación en vivo:** respuestas HTTP `200` para la página principal, `humedales_data.js` y `sinader_data.js`.
+  - La cuenta `geoidegeoidal` ya estaba autenticada con `gh` (keyring, protocolo https, scopes 'gist','read:org','repo','workflow'); no se requirió `gh auth login` interactivo.
+- **Flujo de actualización futura:** cada cambio se publica con `git add -A && git commit -m "..."` + `git push`; GitHub Pages se reconstruye automáticamente.
