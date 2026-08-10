@@ -1,0 +1,10 @@
+# Datos brutos gigantes (no necesarios para la web publicada; se conservan solo en local)
+gi-sinader-2024-ckan (1) (1).xlsx
+
+# Archivos temporales del sistema
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Registros y temporales
+*.log
