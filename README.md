@@ -1,45 +1,76 @@
-# Humedales WebGIS - Visor de Humedales Urbanos y SINADER de Chile
+# Humedales WebGIS
+**Humedales urbanos y establecimientos SINADER de Chile**
 
-Visor cartográfico web (WebGIS) que muestra en un mapa interactivo los **Humedales Urbanos** de Chile junto con los **establecimientos SINADER** (declaraciones de residuos), y permite realizar **geoprocesos espaciales** directamente en el navegador, sin necesidad de servidor ni instalación.
+Explora ambas capas, filtra por región y realiza **buffers e intersecciones espaciales en el navegador**. Exporta los resultados para continuar el trabajo en QGIS o ArcGIS.
 
-## ¿Qué ofrece?
+**[Inicio rápido](#inicio-rápido) · [Operaciones](#operaciones) · [Datos](#datos) · [Tecnologías](#tecnologías)**
 
-- Mapa base oscuro (CartoDB) de todo Chile con capas interactivas:
-  - **Humedales Urbanos** (polígonos, Ministerio del Medio Ambiente).
-  - **SINADER 2024** (~9.100 establecimientos declarantes de residuos).
-- Panel con filtros por región y toggles de visibilidad por capa.
-- Popups con la información de cada entidad al hacer clic.
-- **Geoprocesos integrados (100% en el navegador):**
-  - **Buffer (Turf.js)**: genera zonas de influencia alrededor de los puntos (con opción de disolución y filtros por región).
-  - **Intersección espacial**: cruza dos capas (Humedales, SINADER o el buffer generado) y calcula los polígonos/puntos resultantes, usando Web Worker para no congelar la interfaz.
-  - Reproyección automática de coordenadas (EPSG:3857 → WGS84) con proj4js.
-- **Exportación** de resultados en **GeoJSON** y **Shapefile** (`.zip`).
+> **Alcance:** es un visor exploratorio. La proximidad o intersección espacial entre establecimientos y humedales no demuestra por sí sola un impacto ambiental.
 
-## Cómo usarlo
+## Inicio rápido
 
-Este visor es una **aplicación 100% cliente** (HTML + JavaScript), diseñada para publicarse en GitHub Pages:
+No hay un paso de compilación ni un backend propio. Para usar una copia local, sirve los archivos desde la raíz del repositorio en lugar de abrir `index.html` con `file://`.
 
-1. Abre la página en tu navegador (o utiliza GitHub Pages).
-2. Activa/desactiva capas con los toggles del panel izquierdo.
-3. Aplica un filtro regional si quieres trabajar una zona específica.
-4. Genera un buffer sobre los establecimientos o cruza capas con el geoproceso de intersección.
-5. Exporta los resultados en GeoJSON o Shapefile para usarlos en QGIS/ArcGIS.
+Con **Git y Python 3** disponibles:
 
-## Tecnologías
+```bash
+git clone https://github.com/geoidegeoidal/humedales_version3.git
+cd humedales_version3
+python -m http.server 8000 --bind 127.0.0.1
+```
 
-- HTML5 + JavaScript (Vanilla, arquitectura modular con IIFEs).
-- **MapLibre GL JS** para el mapa interactivo.
-- **Turf.js 7.1.0** para geoprocesamiento espacial.
-- **proj4js** para transformaciones de coordenadas.
-- **@mapbox/shp-write** para exportación a Shapefile.
-- **Web Workers** para procesar grandes volúmenes sin bloquear la interfaz.
-- **IndexedDB** para almacenar en caché los resultados (el buffer generado sobrevive a recargas).
+Abre **http://127.0.0.1:8000/**. En Windows, si tu instalación usa el lanzador `py`, puedes sustituir `python` por `py -3`.
+
+**Requiere conexión para los recursos externos:** las capas están incluidas en el repositorio, pero el mapa base de CARTO y varias bibliotecas se cargan desde servicios/CDN. Ejecutar los geoprocesos en el navegador no equivale a disponer de un visor completamente offline.
+
+## Primer recorrido
+
+1. **Explora:** activa o desactiva Humedales Urbanos y SINADER desde el panel.
+2. **Delimita:** aplica el filtro regional para trabajar en una zona.
+3. **Consulta:** selecciona una entidad del mapa para revisar sus atributos.
+4. **Analiza:** genera un buffer o selecciona las capas que quieres intersectar.
+5. **Exporta:** descarga la selección o el resultado en GeoJSON o Shapefile.
+
+## Operaciones
+
+| Operación | Qué permite | Qué revisar |
+| :--- | :--- | :--- |
+| **Capas y filtros** | Mostrar humedales y establecimientos; filtrar por región | Visibilidad y filtros activos antes de exportar |
+| **Buffer** | Crear zonas de influencia alrededor de puntos, con opción de disolución | Distancia, región y capa de origen elegidas |
+| **Intersección** | Cruzar Humedales, SINADER o un buffer generado | Tipos de geometría de las entradas y entidades resultantes |
+| **GeoJSON** | Descargar datos para continuar el análisis en otro SIG | Atributos, coordenadas y alcance del resultado |
+| **Shapefile** | Descargar un ZIP con los archivos del formato | Extraer el conjunto completo antes de abrirlo en un SIG |
+
+El visor incorpora transformación de coordenadas **EPSG:3857 → WGS84** con proj4js. Los procesos pesados utilizan Web Workers; su duración y el consumo de memoria dependen del volumen y la complejidad de los datos.
 
 ## Datos
 
-- Humedales Urbanos: Ministerio del Medio Ambiente de Chile.
-- SINADER 2024: Sistema Nacional de Declaración de Residuos, información pública agregada por establecimiento.
+| Capa | Fuente | Archivos incluidos |
+| :--- | :--- | :--- |
+| **Humedales Urbanos** | Ministerio del Medio Ambiente de Chile | [GeoJSON](Humedales%20Urbanos%20%281%29.geojson) · [carga JavaScript](humedales_data.js) |
+| **SINADER 2024** | Sistema Nacional de Declaración de Residuos; datos agregados por establecimiento | [GeoJSON](sinader_2024_establecimientos.geojson) · [carga JavaScript](sinader_data.js) |
 
-## Despliegue
+Las capas representan los archivos versionados del proyecto, no una consulta en tiempo real a los sistemas de origen. Revisa su cobertura, fecha y atributos antes de utilizarlas para decisiones o informes.
 
-Publicado automáticamente con **GitHub Pages** desde la rama `main` (carpeta raíz).
+## Tecnologías
+
+| Componente | Función |
+| :--- | :--- |
+| **HTML + JavaScript** | Aplicación estática organizada con módulos IIFE |
+| **MapLibre GL JS** | Navegación cartográfica y capas interactivas |
+| **Turf.js 7.1.0** | Geoprocesamiento espacial |
+| **proj4js** | Transformación de coordenadas |
+| **@mapbox/shp-write** | Exportación a Shapefile |
+| **Web Workers** | Trabajo de geoprocesamiento fuera del hilo principal |
+| **IndexedDB** | Caché local de resultados, incluido el buffer generado |
+
+La caché pertenece al navegador y al sitio desde el que lo abres. No sustituye una exportación de los resultados que quieras conservar.
+
+## Estructura y publicación
+
+- [`index.html`](index.html): interfaz, mapa y lógica de la aplicación.
+- `humedales_data.js` y `sinader_data.js`: capas cargadas por el visor.
+- Archivos `.geojson`: fuentes versionadas.
+- [`convert_sinader.py`](convert_sinader.py): preparación de los datos SINADER.
+
+El proyecto puede publicarse como sitio estático en **GitHub Pages**, desde la rama `main` y la carpeta raíz. Mantén juntos `index.html` y los archivos de datos para que funcionen las rutas relativas.
